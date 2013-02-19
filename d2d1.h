@@ -2034,24 +2034,45 @@ DECLARE_INTERFACE_(ID2D1TransformedGeometry, ID2D1Geometry)
 #define ID2D1TransformedGeometry_GetSourceGeometry(this,A) (this)->lpVtbl->GetSourceGeometry(this,A)
 #define ID2D1TransformedGeometry_GetTransform(this,A) (this)->lpVtbl->GetTransform(this,A)
 
-/* already exists in unknwn.h>
-#define INTERFACE IUnknown
-DECLARE_INTERFACE(IUnknown)
-{
-  BEGIN_INTERFACE
 
-  /* IUnknown methods /
-  STDMETHOD(QueryInterface)(THIS_ REFIID riid, void **ppvObject) PURE;
-  STDMETHOD_(ULONG, AddRef)(THIS) PURE;
-  STDMETHOD_(ULONG, Release)(THIS) PURE;
 
-  END_INTERFACE
-};
-#undef INTERFACE
+static const IID IID_ID2D1Factory = {0x06152247,0x6f50,0x465a,{0x92,0x45,0x11,0x8b,0xfd,0x3b,0x60,0x07}};
 
-#define IUnknown_QueryInterface(this,A,B) (this)->lpVtbl->QueryInterface(this,A,B)
-#define IUnknown_AddRef(this) (this)->lpVtbl->AddRef(this)
-#define IUnknown_Release(this) (this)->lpVtbl->Release(this)
-*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+HRESULT WINAPI D2D1CreateFactory(
+  D2D1_FACTORY_TYPE factoryType,
+  REFIID riid,
+  CONST D2D1_FACTORY_OPTIONS *pFactoryOptions,
+  void **ppIFactory
+);
+  
+WINBOOL WINAPI D2D1InvertMatrix(
+  D2D1_MATRIX_3X2_F *matrix
+);
+
+WINBOOL WINAPI D2D1IsMatrixInvertible(
+  const D2D1_MATRIX_3X2_F *matrix
+);
+
+void WINAPI D2D1MakeRotateMatrix(
+  FLOAT angle,
+  D2D1_POINT_2F center,
+  D2D1_MATRIX_3X2_F *matrix
+);
+
+void WINAPI D2D1MakeSkewMatrix(
+  FLOAT angleX,
+  FLOAT angleY,
+  D2D1_POINT_2F center,
+  D2D1_MATRIX_3X2_F *matrix
+);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _D2D1_H */
