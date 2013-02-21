@@ -4,7 +4,20 @@
 
 	No original Microsoft headers were used in the creation of this
 	file.
-
+  
+  2013.02.19 --
+  Interface vtables have been organized by reverse-engineering
+  the original order in Microsoft's d2d1.h using the following
+  process:
+  - Read Microsoft's "d2d1.h" on a Windows 8 computer with the
+    Visual Studio Windows SDK installed, and manually write down
+    the order of vtable functions in a reference text file.
+  - Open the reference text file on a separate computer without
+    the Windows SDK, and reorder the functions in this
+    MinGW-compatible "d2d1.h" file according to the reference
+    file.
+  See also:
+  http://blog.2of1.org/2010/09/20/use-of-microsoft-windows-sdk-headers-as-foss-reference-ok/
 */
 
 #ifndef _D2D1_H
@@ -552,12 +565,12 @@ DECLARE_INTERFACE_(ID2D1Bitmap, ID2D1Resource)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Bitmap methods */
+  STDMETHOD_(D2D1_SIZE_F, GetSize)(THIS) PURE;
+  STDMETHOD_(D2D1_SIZE_U, GetPixelSize)(THIS) PURE;
+  STDMETHOD_(D2D1_PIXEL_FORMAT, GetPixelFormat)(THIS) PURE;
+  STDMETHOD_(void, GetDpi)(THIS_ FLOAT *dpiX, FLOAT *dpiY) PURE;
   STDMETHOD(CopyFromBitmap)(THIS_ D2D1_POINT_2U *destPoint, ID2D1Bitmap *bitmap, D2D1_RECT_U *srcRect) PURE;
   STDMETHOD(CopyFromRenderTarget)(THIS_ D2D1_POINT_2U *destPoint, ID2D1RenderTarget *renderTarget, D2D1_RECT_U *srcRect) PURE;
-  STDMETHOD_(void, GetDpi)(THIS_ FLOAT *dpiX, FLOAT *dpiY) PURE;
-  STDMETHOD_(D2D1_PIXEL_FORMAT, GetPixelFormat)(THIS) PURE;
-  STDMETHOD_(D2D1_SIZE_U, GetPixelSize)(THIS) PURE;
-  STDMETHOD_(D2D1_SIZE_F, GetSize)(THIS) PURE;
   STDMETHOD(CopyFromMemory)(THIS_ D2D1_RECT_U *dstRect, void *srcData, UINT32 pitch) PURE;
 
   END_INTERFACE
@@ -590,20 +603,20 @@ DECLARE_INTERFACE_(ID2D1BitmapBrush, ID2D1Brush)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Brush methods */
-  STDMETHOD_(FLOAT, GetOpacity)(THIS) PURE;
-  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
   STDMETHOD_(void, SetOpacity)(THIS_ FLOAT opacity) PURE;
   STDMETHOD_(void, SetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
+  STDMETHOD_(FLOAT, GetOpacity)(THIS) PURE;
+  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
 
   /* ID2D1BitmapBrush methods */
-  STDMETHOD_(void, GetBitmap)(THIS_ ID2D1Bitmap **bitmap) PURE;
-  STDMETHOD_(D2D1_EXTEND_MODE, GetExtendModeX)(THIS) PURE;
-  STDMETHOD_(D2D1_EXTEND_MODE, GetExtendModeY)(THIS) PURE;
-  STDMETHOD_(D2D1_BITMAP_INTERPOLATION_MODE, GetInterpolationMode)(THIS) PURE;
-  STDMETHOD_(void, SetBitmap)(THIS_ ID2D1Bitmap *bitmap) PURE;
   STDMETHOD_(void, SetExtendModeX)(THIS_ D2D1_EXTEND_MODE extendModeX) PURE;
   STDMETHOD_(void, SetExtendModeY)(THIS_ D2D1_EXTEND_MODE extendModeY) PURE;
   STDMETHOD_(void, SetInterpolationMode)(THIS_ D2D1_BITMAP_INTERPOLATION_MODE interpolationMode) PURE;
+  STDMETHOD_(void, SetBitmap)(THIS_ ID2D1Bitmap *bitmap) PURE;
+  STDMETHOD_(D2D1_EXTEND_MODE, GetExtendModeX)(THIS) PURE;
+  STDMETHOD_(D2D1_EXTEND_MODE, GetExtendModeY)(THIS) PURE;
+  STDMETHOD_(D2D1_BITMAP_INTERPOLATION_MODE, GetInterpolationMode)(THIS) PURE;
+  STDMETHOD_(void, GetBitmap)(THIS_ ID2D1Bitmap **bitmap) PURE;
 
   END_INTERFACE
 };
@@ -636,59 +649,59 @@ DECLARE_INTERFACE_(ID2D1BitmapRenderTarget, ID2D1RenderTarget)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1RenderTarget methods */
-  STDMETHOD_(void, BeginDraw)(THIS) PURE;
-  STDMETHOD_(void, Clear)(THIS_ D2D1_COLOR_F *clearColor) PURE;
   STDMETHOD(CreateBitmap)(THIS_ D2D1_SIZE_U size, void *srcData, UINT32 pitch, D2D1_BITMAP_PROPERTIES *bitmapProperties, ID2D1Bitmap **bitmap) PURE;
-  STDMETHOD(CreateBitmapBrush)(THIS_ ID2D1Bitmap *bitmap, ID2D1BitmapBrush **bitmapBrush) PURE;
   STDMETHOD(CreateBitmapFromWicBitmap)(THIS_ IWICBitmapSource *wicBitmapSource, ID2D1Bitmap **bitmap) PURE;
-  STDMETHOD(CreateCompatibleRenderTarget)(THIS_ ID2D1BitmapRenderTarget **bitmapRenderTarget) PURE;
-  STDMETHOD(CreateGradientStopCollection)(THIS_ D2D1_GRADIENT_STOP *gradientStops, UINT gradientStopsCount, ID2D1GradientStopCollection **gradientStopCollection) PURE;
-  STDMETHOD(CreateLayer)(THIS_ ID2D1Layer **layer) PURE;
-  STDMETHOD(CreateLinearGradientBrush)(THIS_ D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES *linearGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1LinearGradientBrush **linearGradientBrush) PURE;
-  STDMETHOD(CreateMesh)(THIS_ ID2D1Mesh **mesh) PURE;
-  STDMETHOD(CreateRadialGradientBrush)(THIS_ D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES *radialGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1RadialGradientBrush **radialGradientBrush) PURE;
   STDMETHOD(CreateSharedBitmap)(THIS_ REFIID riid, void *data, D2D1_BITMAP_PROPERTIES *bitmapProperties, ID2D1Bitmap **bitmap) PURE;
+  STDMETHOD(CreateBitmapBrush)(THIS_ ID2D1Bitmap *bitmap, ID2D1BitmapBrush **bitmapBrush) PURE;
   STDMETHOD(CreateSolidColorBrush)(THIS_ D2D1_COLOR_F *color, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1SolidColorBrush **solidColorBrush) PURE;
-  STDMETHOD_(void, DrawBitmap)(THIS_ ID2D1Bitmap *bitmap, D2D1_RECT_F *destinationRectangle, FLOAT opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode, D2D1_RECT_F *sourceRectangle) PURE;
-  STDMETHOD_(void, DrawEllipse)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
-  STDMETHOD_(void, DrawGeometry)(THIS_ ID2D1Geometry *geometry, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
-  STDMETHOD_(void, DrawGlyphRun)(THIS_ D2D1_POINT_2F baselineOrigin, DWRITE_GLYPH_RUN *glyphRun, ID2D1Brush *foregroundBrush, DWRITE_MEASURING_MODE measuringMode) PURE;
+  STDMETHOD(CreateGradientStopCollection)(THIS_ D2D1_GRADIENT_STOP *gradientStops, UINT gradientStopsCount, ID2D1GradientStopCollection **gradientStopCollection) PURE;
+  STDMETHOD(CreateLinearGradientBrush)(THIS_ D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES *linearGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1LinearGradientBrush **linearGradientBrush) PURE;
+  STDMETHOD(CreateRadialGradientBrush)(THIS_ D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES *radialGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1RadialGradientBrush **radialGradientBrush) PURE;
+  STDMETHOD(CreateCompatibleRenderTarget)(THIS_ ID2D1BitmapRenderTarget **bitmapRenderTarget) PURE;
+  STDMETHOD(CreateLayer)(THIS_ ID2D1Layer **layer) PURE;
+  STDMETHOD(CreateMesh)(THIS_ ID2D1Mesh **mesh) PURE;
   STDMETHOD_(void, DrawLine)(THIS_ D2D1_POINT_2F point0, D2D1_POINT_2F point1, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
   STDMETHOD_(void, DrawRectangle)(THIS_ D2D1_RECT_F *rect, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
+  STDMETHOD_(void, FillRectangle)(THIS_ D2D1_RECT_F *rect, ID2D1Brush *brush) PURE;
   STDMETHOD_(void, DrawRoundedRectangle)(THIS_ D2D1_ROUNDED_RECT *roundedRect, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
-  STDMETHOD_(void, DrawText)(THIS_ WCHAR *string, UINT stringLength, IDWriteTextFormat *textFormat, D2D1_RECT_F *layoutRect, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options , DWRITE_MEASURING_MODE measuringMode) PURE;
-  STDMETHOD_(void, DrawTextLayout)(THIS_ D2D1_POINT_2F origin, IDWriteTextLayout *textLayout, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options) PURE;
-  STDMETHOD(EndDraw)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(void, FillRoundedRectangle)(THIS_ D2D1_ROUNDED_RECT *roundedRect, ID2D1Brush *brush) PURE;
+  STDMETHOD_(void, DrawEllipse)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
   STDMETHOD_(void, FillEllipse)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1Brush *brush) PURE;
+  STDMETHOD_(void, DrawGeometry)(THIS_ ID2D1Geometry *geometry, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
   STDMETHOD_(void, FillGeometry)(THIS_ ID2D1Geometry *geometry, ID2D1Brush *brush, ID2D1Brush *opacityBrush) PURE;
   STDMETHOD_(void, FillMesh)(THIS_ ID2D1Mesh *mesh, ID2D1Brush *brush) PURE;
   STDMETHOD_(void, FillOpacityMask)(THIS_ ID2D1Bitmap *opacityMask, ID2D1Brush *brush, D2D1_OPACITY_MASK_CONTENT content, D2D1_RECT_F *destinationRectangle, D2D1_RECT_F *sourceRectangle) PURE;
-  STDMETHOD_(void, FillRectangle)(THIS_ D2D1_RECT_F *rect, ID2D1Brush *brush) PURE;
-  STDMETHOD_(void, FillRoundedRectangle)(THIS_ D2D1_ROUNDED_RECT *roundedRect, ID2D1Brush *brush) PURE;
-  STDMETHOD(Flush)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
-  STDMETHOD_(D2D1_ANTIALIAS_MODE, GetAntialiasMode)(THIS) PURE;
-  STDMETHOD_(void, GetDpi)(THIS_ FLOAT *dpiX, FLOAT *dpiY) PURE;
-  STDMETHOD_(UINT32, GetMaximumBitmapSize)(THIS) PURE;
-  STDMETHOD_(D2D1_PIXEL_FORMAT, GetPixelFormat)(THIS) PURE;
-  STDMETHOD_(D2D1_SIZE_U, GetPixelSize)(THIS) PURE;
-  STDMETHOD_(D2D1_SIZE_F, GetSize)(THIS) PURE;
-  STDMETHOD_(void, GetTags)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
-  STDMETHOD_(D2D1_TEXT_ANTIALIAS_MODE, GetTextAntialiasMode)(THIS) PURE;
-  STDMETHOD_(void, GetTextRenderingParams)(THIS_ IDWriteRenderingParams **textRenderingParams) PURE;
-  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
-  STDMETHOD_(BOOL, IsSupported)(THIS_ D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties) PURE;
-  STDMETHOD_(void, PopAxisAlignedClip)(THIS) PURE;
-  STDMETHOD_(void, PopLayer)(THIS) PURE;
-  STDMETHOD_(void, PushAxisAlignedClip)(THIS_ D2D1_RECT_F *clipRect, D2D1_ANTIALIAS_MODE antialiasMode) PURE;
-  STDMETHOD_(void, PushLayer)(THIS_ D2D1_LAYER_PARAMETERS *layerParameters, ID2D1Layer *layer) PURE;
-  STDMETHOD_(void, RestoreDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
-  STDMETHOD_(void, SaveDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
-  STDMETHOD_(void, SetAntialiasMode)(THIS_ D2D1_ANTIALIAS_MODE antialiasMode) PURE;
-  STDMETHOD_(void, SetDpi)(THIS_ FLOAT dpiX, FLOAT dpiY) PURE;
-  STDMETHOD_(void, SetTags)(THIS_ D2D1_TAG tag1, D2D1_TAG tag2) PURE;
-  STDMETHOD_(void, SetTextAntialiasMode)(THIS_ D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode) PURE;
-  STDMETHOD_(void, SetTextRenderingParams)(THIS_ IDWriteRenderingParams *textRenderingParams) PURE;
+  STDMETHOD_(void, DrawBitmap)(THIS_ ID2D1Bitmap *bitmap, D2D1_RECT_F *destinationRectangle, FLOAT opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode , D2D1_RECT_F *sourceRectangle) PURE;
+  STDMETHOD_(void, DrawText)(THIS_ WCHAR *string, UINT stringLength, IDWriteTextFormat *textFormat, D2D1_RECT_F *layoutRect, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options , DWRITE_MEASURING_MODE measuringMode) PURE;
+  STDMETHOD_(void, DrawTextLayout)(THIS_ D2D1_POINT_2F origin, IDWriteTextLayout *textLayout, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options) PURE;
+  STDMETHOD_(void, DrawGlyphRun)(THIS_ D2D1_POINT_2F baselineOrigin, DWRITE_GLYPH_RUN *glyphRun, ID2D1Brush *foregroundBrush, DWRITE_MEASURING_MODE measuringMode) PURE;
   STDMETHOD_(void, SetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
+  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
+  STDMETHOD_(void, SetAntialiasMode)(THIS_ D2D1_ANTIALIAS_MODE antialiasMode) PURE;
+  STDMETHOD_(D2D1_ANTIALIAS_MODE, GetAntialiasMode)(THIS) PURE;
+  STDMETHOD_(void, SetTextAntialiasMode)(THIS_ D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode) PURE;
+  STDMETHOD_(D2D1_TEXT_ANTIALIAS_MODE, GetTextAntialiasMode)(THIS) PURE;
+  STDMETHOD_(void, SetTextRenderingParams)(THIS_ IDWriteRenderingParams *textRenderingParams) PURE;
+  STDMETHOD_(void, GetTextRenderingParams)(THIS_ IDWriteRenderingParams **textRenderingParams) PURE;
+  STDMETHOD_(void, SetTags)(THIS_ D2D1_TAG tag1, D2D1_TAG tag2) PURE;
+  STDMETHOD_(void, GetTags)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(void, PushLayer)(THIS_ D2D1_LAYER_PARAMETERS *layerParameters, ID2D1Layer *layer) PURE;
+  STDMETHOD_(void, PopLayer)(THIS) PURE;
+  STDMETHOD(Flush)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(void, SaveDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
+  STDMETHOD_(void, RestoreDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
+  STDMETHOD_(void, PushAxisAlignedClip)(THIS_ D2D1_RECT_F *clipRect, D2D1_ANTIALIAS_MODE antialiasMode) PURE;
+  STDMETHOD_(void, PopAxisAlignedClip)(THIS) PURE;
+  STDMETHOD_(void, Clear)(THIS_ D2D1_COLOR_F *clearColor) PURE;
+  STDMETHOD_(void, BeginDraw)(THIS) PURE;
+  STDMETHOD(EndDraw)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(D2D1_PIXEL_FORMAT, GetPixelFormat)(THIS) PURE;
+  STDMETHOD_(void, SetDpi)(THIS_ FLOAT dpiX, FLOAT dpiY) PURE;
+  STDMETHOD_(void, GetDpi)(THIS_ FLOAT *dpiX, FLOAT *dpiY) PURE;
+  STDMETHOD_(D2D1_SIZE_F, GetSize)(THIS) PURE;
+  STDMETHOD_(D2D1_SIZE_U, GetPixelSize)(THIS) PURE;
+  STDMETHOD_(UINT32, GetMaximumBitmapSize)(THIS) PURE;
+  STDMETHOD_(BOOL, IsSupported)(THIS_ D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties) PURE;
 
   /* ID2D1BitmapRenderTarget methods */
   STDMETHOD(GetBitmap)(THIS_ ID2D1Bitmap **bitmap) PURE;
@@ -766,10 +779,10 @@ DECLARE_INTERFACE_(ID2D1Brush, ID2D1Resource)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Brush methods */
-  STDMETHOD_(FLOAT, GetOpacity)(THIS) PURE;
-  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
   STDMETHOD_(void, SetOpacity)(THIS_ FLOAT opacity) PURE;
   STDMETHOD_(void, SetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
+  STDMETHOD_(FLOAT, GetOpacity)(THIS) PURE;
+  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
 
   END_INTERFACE
 };
@@ -798,59 +811,59 @@ DECLARE_INTERFACE_(ID2D1DCRenderTarget, ID2D1RenderTarget)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1RenderTarget methods */
-  STDMETHOD_(void, BeginDraw)(THIS) PURE;
-  STDMETHOD_(void, Clear)(THIS_ D2D1_COLOR_F *clearColor) PURE;
   STDMETHOD(CreateBitmap)(THIS_ D2D1_SIZE_U size, void *srcData, UINT32 pitch, D2D1_BITMAP_PROPERTIES *bitmapProperties, ID2D1Bitmap **bitmap) PURE;
-  STDMETHOD(CreateBitmapBrush)(THIS_ ID2D1Bitmap *bitmap, ID2D1BitmapBrush **bitmapBrush) PURE;
   STDMETHOD(CreateBitmapFromWicBitmap)(THIS_ IWICBitmapSource *wicBitmapSource, ID2D1Bitmap **bitmap) PURE;
-  STDMETHOD(CreateCompatibleRenderTarget)(THIS_ ID2D1BitmapRenderTarget **bitmapRenderTarget) PURE;
-  STDMETHOD(CreateGradientStopCollection)(THIS_ D2D1_GRADIENT_STOP *gradientStops, UINT gradientStopsCount, ID2D1GradientStopCollection **gradientStopCollection) PURE;
-  STDMETHOD(CreateLayer)(THIS_ ID2D1Layer **layer) PURE;
-  STDMETHOD(CreateLinearGradientBrush)(THIS_ D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES *linearGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1LinearGradientBrush **linearGradientBrush) PURE;
-  STDMETHOD(CreateMesh)(THIS_ ID2D1Mesh **mesh) PURE;
-  STDMETHOD(CreateRadialGradientBrush)(THIS_ D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES *radialGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1RadialGradientBrush **radialGradientBrush) PURE;
   STDMETHOD(CreateSharedBitmap)(THIS_ REFIID riid, void *data, D2D1_BITMAP_PROPERTIES *bitmapProperties, ID2D1Bitmap **bitmap) PURE;
+  STDMETHOD(CreateBitmapBrush)(THIS_ ID2D1Bitmap *bitmap, ID2D1BitmapBrush **bitmapBrush) PURE;
   STDMETHOD(CreateSolidColorBrush)(THIS_ D2D1_COLOR_F *color, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1SolidColorBrush **solidColorBrush) PURE;
-  STDMETHOD_(void, DrawBitmap)(THIS_ ID2D1Bitmap *bitmap, D2D1_RECT_F *destinationRectangle, FLOAT opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode , D2D1_RECT_F *sourceRectangle) PURE;
-  STDMETHOD_(void, DrawEllipse)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
-  STDMETHOD_(void, DrawGeometry)(THIS_ ID2D1Geometry *geometry, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
-  STDMETHOD_(void, DrawGlyphRun)(THIS_ D2D1_POINT_2F baselineOrigin, DWRITE_GLYPH_RUN *glyphRun, ID2D1Brush *foregroundBrush, DWRITE_MEASURING_MODE measuringMode) PURE;
+  STDMETHOD(CreateGradientStopCollection)(THIS_ D2D1_GRADIENT_STOP *gradientStops, UINT gradientStopsCount, ID2D1GradientStopCollection **gradientStopCollection) PURE;
+  STDMETHOD(CreateLinearGradientBrush)(THIS_ D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES *linearGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1LinearGradientBrush **linearGradientBrush) PURE;
+  STDMETHOD(CreateRadialGradientBrush)(THIS_ D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES *radialGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1RadialGradientBrush **radialGradientBrush) PURE;
+  STDMETHOD(CreateCompatibleRenderTarget)(THIS_ ID2D1BitmapRenderTarget **bitmapRenderTarget) PURE;
+  STDMETHOD(CreateLayer)(THIS_ ID2D1Layer **layer) PURE;
+  STDMETHOD(CreateMesh)(THIS_ ID2D1Mesh **mesh) PURE;
   STDMETHOD_(void, DrawLine)(THIS_ D2D1_POINT_2F point0, D2D1_POINT_2F point1, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
   STDMETHOD_(void, DrawRectangle)(THIS_ D2D1_RECT_F *rect, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
+  STDMETHOD_(void, FillRectangle)(THIS_ D2D1_RECT_F *rect, ID2D1Brush *brush) PURE;
   STDMETHOD_(void, DrawRoundedRectangle)(THIS_ D2D1_ROUNDED_RECT *roundedRect, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
-  STDMETHOD_(void, DrawText)(THIS_ WCHAR *string, UINT stringLength, IDWriteTextFormat *textFormat, D2D1_RECT_F *layoutRect, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options , DWRITE_MEASURING_MODE measuringMode) PURE;
-  STDMETHOD_(void, DrawTextLayout)(THIS_ D2D1_POINT_2F origin, IDWriteTextLayout *textLayout, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options) PURE;
-  STDMETHOD(EndDraw)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(void, FillRoundedRectangle)(THIS_ D2D1_ROUNDED_RECT *roundedRect, ID2D1Brush *brush) PURE;
+  STDMETHOD_(void, DrawEllipse)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
   STDMETHOD_(void, FillEllipse)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1Brush *brush) PURE;
+  STDMETHOD_(void, DrawGeometry)(THIS_ ID2D1Geometry *geometry, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
   STDMETHOD_(void, FillGeometry)(THIS_ ID2D1Geometry *geometry, ID2D1Brush *brush, ID2D1Brush *opacityBrush) PURE;
   STDMETHOD_(void, FillMesh)(THIS_ ID2D1Mesh *mesh, ID2D1Brush *brush) PURE;
   STDMETHOD_(void, FillOpacityMask)(THIS_ ID2D1Bitmap *opacityMask, ID2D1Brush *brush, D2D1_OPACITY_MASK_CONTENT content, D2D1_RECT_F *destinationRectangle, D2D1_RECT_F *sourceRectangle) PURE;
-  STDMETHOD_(void, FillRectangle)(THIS_ D2D1_RECT_F *rect, ID2D1Brush *brush) PURE;
-  STDMETHOD_(void, FillRoundedRectangle)(THIS_ D2D1_ROUNDED_RECT *roundedRect, ID2D1Brush *brush) PURE;
-  STDMETHOD(Flush)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
-  STDMETHOD_(D2D1_ANTIALIAS_MODE, GetAntialiasMode)(THIS) PURE;
-  STDMETHOD_(void, GetDpi)(THIS_ FLOAT *dpiX, FLOAT *dpiY) PURE;
-  STDMETHOD_(UINT32, GetMaximumBitmapSize)(THIS) PURE;
-  STDMETHOD_(D2D1_PIXEL_FORMAT, GetPixelFormat)(THIS) PURE;
-  STDMETHOD_(D2D1_SIZE_U, GetPixelSize)(THIS) PURE;
-  STDMETHOD_(D2D1_SIZE_F, GetSize)(THIS) PURE;
-  STDMETHOD_(void, GetTags)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
-  STDMETHOD_(D2D1_TEXT_ANTIALIAS_MODE, GetTextAntialiasMode)(THIS) PURE;
-  STDMETHOD_(void, GetTextRenderingParams)(THIS_ IDWriteRenderingParams **textRenderingParams) PURE;
-  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
-  STDMETHOD_(BOOL, IsSupported)(THIS_ D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties) PURE;
-  STDMETHOD_(void, PopAxisAlignedClip)(THIS) PURE;
-  STDMETHOD_(void, PopLayer)(THIS) PURE;
-  STDMETHOD_(void, PushAxisAlignedClip)(THIS_ D2D1_RECT_F *clipRect, D2D1_ANTIALIAS_MODE antialiasMode) PURE;
-  STDMETHOD_(void, PushLayer)(THIS_ D2D1_LAYER_PARAMETERS *layerParameters, ID2D1Layer *layer) PURE;
-  STDMETHOD_(void, RestoreDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
-  STDMETHOD_(void, SaveDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
-  STDMETHOD_(void, SetAntialiasMode)(THIS_ D2D1_ANTIALIAS_MODE antialiasMode) PURE;
-  STDMETHOD_(void, SetDpi)(THIS_ FLOAT dpiX, FLOAT dpiY) PURE;
-  STDMETHOD_(void, SetTags)(THIS_ D2D1_TAG tag1, D2D1_TAG tag2) PURE;
-  STDMETHOD_(void, SetTextAntialiasMode)(THIS_ D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode) PURE;
-  STDMETHOD_(void, SetTextRenderingParams)(THIS_ IDWriteRenderingParams *textRenderingParams) PURE;
+  STDMETHOD_(void, DrawBitmap)(THIS_ ID2D1Bitmap *bitmap, D2D1_RECT_F *destinationRectangle, FLOAT opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode , D2D1_RECT_F *sourceRectangle) PURE;
+  STDMETHOD_(void, DrawText)(THIS_ WCHAR *string, UINT stringLength, IDWriteTextFormat *textFormat, D2D1_RECT_F *layoutRect, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options , DWRITE_MEASURING_MODE measuringMode) PURE;
+  STDMETHOD_(void, DrawTextLayout)(THIS_ D2D1_POINT_2F origin, IDWriteTextLayout *textLayout, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options) PURE;
+  STDMETHOD_(void, DrawGlyphRun)(THIS_ D2D1_POINT_2F baselineOrigin, DWRITE_GLYPH_RUN *glyphRun, ID2D1Brush *foregroundBrush, DWRITE_MEASURING_MODE measuringMode) PURE;
   STDMETHOD_(void, SetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
+  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
+  STDMETHOD_(void, SetAntialiasMode)(THIS_ D2D1_ANTIALIAS_MODE antialiasMode) PURE;
+  STDMETHOD_(D2D1_ANTIALIAS_MODE, GetAntialiasMode)(THIS) PURE;
+  STDMETHOD_(void, SetTextAntialiasMode)(THIS_ D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode) PURE;
+  STDMETHOD_(D2D1_TEXT_ANTIALIAS_MODE, GetTextAntialiasMode)(THIS) PURE;
+  STDMETHOD_(void, SetTextRenderingParams)(THIS_ IDWriteRenderingParams *textRenderingParams) PURE;
+  STDMETHOD_(void, GetTextRenderingParams)(THIS_ IDWriteRenderingParams **textRenderingParams) PURE;
+  STDMETHOD_(void, SetTags)(THIS_ D2D1_TAG tag1, D2D1_TAG tag2) PURE;
+  STDMETHOD_(void, GetTags)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(void, PushLayer)(THIS_ D2D1_LAYER_PARAMETERS *layerParameters, ID2D1Layer *layer) PURE;
+  STDMETHOD_(void, PopLayer)(THIS) PURE;
+  STDMETHOD(Flush)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(void, SaveDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
+  STDMETHOD_(void, RestoreDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
+  STDMETHOD_(void, PushAxisAlignedClip)(THIS_ D2D1_RECT_F *clipRect, D2D1_ANTIALIAS_MODE antialiasMode) PURE;
+  STDMETHOD_(void, PopAxisAlignedClip)(THIS) PURE;
+  STDMETHOD_(void, Clear)(THIS_ D2D1_COLOR_F *clearColor) PURE;
+  STDMETHOD_(void, BeginDraw)(THIS) PURE;
+  STDMETHOD(EndDraw)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(D2D1_PIXEL_FORMAT, GetPixelFormat)(THIS) PURE;
+  STDMETHOD_(void, SetDpi)(THIS_ FLOAT dpiX, FLOAT dpiY) PURE;
+  STDMETHOD_(void, GetDpi)(THIS_ FLOAT *dpiX, FLOAT *dpiY) PURE;
+  STDMETHOD_(D2D1_SIZE_F, GetSize)(THIS) PURE;
+  STDMETHOD_(D2D1_SIZE_U, GetPixelSize)(THIS) PURE;
+  STDMETHOD_(UINT32, GetMaximumBitmapSize)(THIS) PURE;
+  STDMETHOD_(BOOL, IsSupported)(THIS_ D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties) PURE;
 
   /* ID2D1DCRenderTarget methods */
   STDMETHOD(BindDC)(THIS_ HDC hDC, RECT *pSubRect) PURE;
@@ -929,9 +942,9 @@ DECLARE_INTERFACE_(ID2D1DrawingStateBlock, ID2D1Resource)
 
   /* ID2D1DrawingStateBlock methods */
   STDMETHOD_(void, GetDescription)(THIS_ D2D1_DRAWING_STATE_DESCRIPTION *stateDescription) PURE;
-  STDMETHOD_(void, GetTextRenderingParams)(THIS_ IDWriteRenderingParams **textRenderingParams) PURE;
   STDMETHOD_(void, SetDescription)(THIS_ D2D1_DRAWING_STATE_DESCRIPTION *stateDescription) PURE;
   STDMETHOD_(void, SetTextRenderingParams)(THIS_ IDWriteRenderingParams *textRenderingParams) PURE;
+  STDMETHOD_(void, GetTextRenderingParams)(THIS_ IDWriteRenderingParams **textRenderingParams) PURE;
 
   END_INTERFACE
 };
@@ -960,18 +973,18 @@ DECLARE_INTERFACE_(ID2D1EllipseGeometry, ID2D1Geometry)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Geometry methods */
-  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
+  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
   STDMETHOD(CompareWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_MATRIX_3X2_F *inputGeometryTransform, D2D1_GEOMETRY_RELATION *relation) PURE;
+  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
+  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
   STDMETHOD(ComputeArea)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *area) PURE;
   STDMETHOD(ComputeLength)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *length) PURE;
   STDMETHOD(ComputePointAtLength)(THIS_ FLOAT length, D2D1_MATRIX_3X2_F *worldTransform, D2D1_POINT_2F *point, D2D1_POINT_2F *unitTangentVector) PURE;
-  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
   STDMETHOD(Widen)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
 
   /* ID2D1EllipseGeometry methods */
@@ -1007,20 +1020,20 @@ DECLARE_INTERFACE_(ID2D1Factory, IUnknown)
   STDMETHOD_(ULONG, Release)(THIS) PURE;
 
   /* ID2D1Factory methods */
-  STDMETHOD(CreateDCRenderTarget)(THIS_ D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties, ID2D1DCRenderTarget **dcRenderTarget) PURE;
+  STDMETHOD(ReloadSystemMetrics)(THIS) PURE;
   STDMETHOD_(void, GetDesktopDpi)(THIS_ FLOAT *dpiX, FLOAT *dpiY) PURE;
-  STDMETHOD(CreateDrawingStateBlock)(THIS_ D2D1_DRAWING_STATE_DESCRIPTION *drawingStateDescription, IDWriteRenderingParams *textRenderingParams, ID2D1DrawingStateBlock **drawingStateBlock) PURE;
-  STDMETHOD(CreateDxgiSurfaceRenderTarget)(THIS_ IDXGISurface *dxgiSurface, D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties, ID2D1RenderTarget **renderTarget) PURE;
-  STDMETHOD(CreateEllipseGeometry)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1EllipseGeometry **ellipseGeometry) PURE;
-  STDMETHOD(CreateGeometryGroup)(THIS_ D2D1_FILL_MODE fillMode, ID2D1Geometry **geometries, UINT geometriesCount, ID2D1GeometryGroup **geometryGroup) PURE;
-  STDMETHOD(CreatePathGeometry)(THIS_ ID2D1PathGeometry **pathGeometry) PURE;
   STDMETHOD(CreateRectangleGeometry)(THIS_ D2D1_RECT_F *rectangle, ID2D1RectangleGeometry **rectangleGeometry) PURE;
   STDMETHOD(CreateRoundedRectangleGeometry)(THIS_ D2D1_ROUNDED_RECT *roundedRectangle, ID2D1RoundedRectangleGeometry **roundedRectangleGeometry) PURE;
-  STDMETHOD(CreateStrokeStyle)(THIS_ D2D1_STROKE_STYLE_PROPERTIES *strokeStyleProperties, FLOAT *dashes, UINT dashesCount, ID2D1StrokeStyle **strokeStyle) PURE;
+  STDMETHOD(CreateEllipseGeometry)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1EllipseGeometry **ellipseGeometry) PURE;
+  STDMETHOD(CreateGeometryGroup)(THIS_ D2D1_FILL_MODE fillMode, ID2D1Geometry **geometries, UINT geometriesCount, ID2D1GeometryGroup **geometryGroup) PURE;
   STDMETHOD(CreateTransformedGeometry)(THIS_ ID2D1Geometry *sourceGeometry, D2D1_MATRIX_3X2_F *transform, ID2D1TransformedGeometry **transformedGeometry) PURE;
-  STDMETHOD(CreateHwndRenderTarget)(THIS_ D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties, D2D1_HWND_RENDER_TARGET_PROPERTIES *hwndRenderTargetProperties, ID2D1HwndRenderTarget **hwndRenderTarget) PURE;
+  STDMETHOD(CreatePathGeometry)(THIS_ ID2D1PathGeometry **pathGeometry) PURE;
+  STDMETHOD(CreateStrokeStyle)(THIS_ D2D1_STROKE_STYLE_PROPERTIES *strokeStyleProperties, FLOAT *dashes, UINT dashesCount, ID2D1StrokeStyle **strokeStyle) PURE;
+  STDMETHOD(CreateDrawingStateBlock)(THIS_ D2D1_DRAWING_STATE_DESCRIPTION *drawingStateDescription, IDWriteRenderingParams *textRenderingParams, ID2D1DrawingStateBlock **drawingStateBlock) PURE;
   STDMETHOD(CreateWicBitmapRenderTarget)(THIS_ IWICBitmap *target, D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties, ID2D1RenderTarget **renderTarget) PURE;
-  STDMETHOD(ReloadSystemMetrics)(THIS) PURE;
+  STDMETHOD(CreateHwndRenderTarget)(THIS_ D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties, D2D1_HWND_RENDER_TARGET_PROPERTIES *hwndRenderTargetProperties, ID2D1HwndRenderTarget **hwndRenderTarget) PURE;
+  STDMETHOD(CreateDxgiSurfaceRenderTarget)(THIS_ IDXGISurface *dxgiSurface, D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties, ID2D1RenderTarget **renderTarget) PURE;
+  STDMETHOD(CreateDCRenderTarget)(THIS_ D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties, ID2D1DCRenderTarget **dcRenderTarget) PURE;
 
   END_INTERFACE
 };
@@ -1082,18 +1095,18 @@ DECLARE_INTERFACE_(ID2D1Geometry, ID2D1Resource)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Geometry methods */
-  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
+  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
   STDMETHOD(CompareWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_MATRIX_3X2_F *inputGeometryTransform, D2D1_GEOMETRY_RELATION *relation) PURE;
+  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
+  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
   STDMETHOD(ComputeArea)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *area) PURE;
   STDMETHOD(ComputeLength)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *length) PURE;
   STDMETHOD(ComputePointAtLength)(THIS_ FLOAT length, D2D1_MATRIX_3X2_F *worldTransform, D2D1_POINT_2F *point, D2D1_POINT_2F *unitTangentVector) PURE;
-  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
   STDMETHOD(Widen)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
 
   END_INTERFACE
@@ -1132,24 +1145,24 @@ DECLARE_INTERFACE_(ID2D1GeometryGroup, ID2D1Geometry)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Geometry methods */
-  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
+  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
   STDMETHOD(CompareWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_MATRIX_3X2_F *inputGeometryTransform, D2D1_GEOMETRY_RELATION *relation) PURE;
+  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
+  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
   STDMETHOD(ComputeArea)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *area) PURE;
   STDMETHOD(ComputeLength)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *length) PURE;
   STDMETHOD(ComputePointAtLength)(THIS_ FLOAT length, D2D1_MATRIX_3X2_F *worldTransform, D2D1_POINT_2F *point, D2D1_POINT_2F *unitTangentVector) PURE;
-  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
   STDMETHOD(Widen)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
 
   /* ID2D1GeometryGroup methods */
   STDMETHOD_(D2D1_FILL_MODE, GetFillMode)(THIS) PURE;
-  STDMETHOD_(void, GetSourceGeometries)(THIS_ ID2D1Geometry **geometries, UINT geometriesCount) PURE;
   STDMETHOD_(UINT32, GetSourceGeometryCount)(THIS) PURE;
+  STDMETHOD_(void, GetSourceGeometries)(THIS_ ID2D1Geometry **geometries, UINT geometriesCount) PURE;
 
   END_INTERFACE
 };
@@ -1183,20 +1196,20 @@ DECLARE_INTERFACE_(ID2D1GeometrySink, ID2D1SimplifiedGeometrySink)
   STDMETHOD_(ULONG, Release)(THIS) PURE;
 
   /* ID2D1SimplifiedGeometrySink methods */
-  STDMETHOD_(void, AddBeziers)(THIS_ D2D1_BEZIER_SEGMENT *beziers, UINT beziersCount) PURE;
-  STDMETHOD_(void, AddLines)(THIS_ D2D1_POINT_2F *points, UINT pointsCount) PURE;
-  STDMETHOD_(void, BeginFigure)(THIS_ D2D1_POINT_2F startPoint, D2D1_FIGURE_BEGIN figureBegin) PURE;
-  STDMETHOD(Close)(THIS) PURE;
-  STDMETHOD_(void, EndFigure)(THIS_ D2D1_FIGURE_END figureEnd) PURE;
   STDMETHOD_(void, SetFillMode)(THIS_ D2D1_FILL_MODE fillMode) PURE;
   STDMETHOD_(void, SetSegmentFlags)(THIS_ D2D1_PATH_SEGMENT vertexFlags) PURE;
+  STDMETHOD_(void, BeginFigure)(THIS_ D2D1_POINT_2F startPoint, D2D1_FIGURE_BEGIN figureBegin) PURE;
+  STDMETHOD_(void, AddLines)(THIS_ D2D1_POINT_2F *points, UINT pointsCount) PURE;
+  STDMETHOD_(void, AddBeziers)(THIS_ D2D1_BEZIER_SEGMENT *beziers, UINT beziersCount) PURE;
+  STDMETHOD_(void, EndFigure)(THIS_ D2D1_FIGURE_END figureEnd) PURE;
+  STDMETHOD(Close)(THIS) PURE;
 
   /* ID2D1GeometrySink methods */
-  STDMETHOD_(void, AddArc)(THIS_ D2D1_ARC_SEGMENT *arc) PURE;
-  STDMETHOD_(void, AddBezier)(THIS_ D2D1_BEZIER_SEGMENT *bezier) PURE;
   STDMETHOD_(void, AddLine)(THIS_ D2D1_POINT_2F point) PURE;
+  STDMETHOD_(void, AddBezier)(THIS_ D2D1_BEZIER_SEGMENT *bezier) PURE;
   STDMETHOD_(void, AddQuadraticBezier)(THIS_ D2D1_QUADRATIC_BEZIER_SEGMENT *bezier) PURE;
   STDMETHOD_(void, AddQuadraticBeziers)(THIS_ D2D1_QUADRATIC_BEZIER_SEGMENT *beziers, UINT bezierCount) PURE;
+  STDMETHOD_(void, AddArc)(THIS_ D2D1_ARC_SEGMENT *arc) PURE;
 
   END_INTERFACE
 };
@@ -1232,10 +1245,10 @@ DECLARE_INTERFACE_(ID2D1GradientStopCollection, ID2D1Resource)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1GradientStopCollection methods */
-  STDMETHOD_(D2D1_GAMMA, GetColorInterpolationGamma)(THIS) PURE;
-  STDMETHOD_(D2D1_EXTEND_MODE, GetExtendMode)(THIS) PURE;
   STDMETHOD_(UINT32, GetGradientStopCount)(THIS) PURE;
   STDMETHOD_(void, GetGradientStops)(THIS_ D2D1_GRADIENT_STOP *gradientStops, UINT gradientStopsCount) PURE;
+  STDMETHOD_(D2D1_GAMMA, GetColorInterpolationGamma)(THIS) PURE;
+  STDMETHOD_(D2D1_EXTEND_MODE, GetExtendMode)(THIS) PURE;
 
   END_INTERFACE
 };
@@ -1265,58 +1278,58 @@ DECLARE_INTERFACE_(ID2D1HwndRenderTarget, ID2D1RenderTarget)
 
   /* ID2D1RenderTarget methods */
   STDMETHOD(CreateBitmap)(THIS_ D2D1_SIZE_U size, void *srcData, UINT32 pitch, D2D1_BITMAP_PROPERTIES *bitmapProperties, ID2D1Bitmap **bitmap) PURE;
-  STDMETHOD_(void, Clear)(THIS_ D2D1_COLOR_F *clearColor) PURE;
-  STDMETHOD(CreateBitmapBrush)(THIS_ ID2D1Bitmap *bitmap, ID2D1BitmapBrush **bitmapBrush) PURE;
   STDMETHOD(CreateBitmapFromWicBitmap)(THIS_ IWICBitmapSource *wicBitmapSource, ID2D1Bitmap **bitmap) PURE;
-  STDMETHOD(CreateCompatibleRenderTarget)(THIS_ ID2D1BitmapRenderTarget **bitmapRenderTarget) PURE;
-  STDMETHOD(CreateGradientStopCollection)(THIS_ D2D1_GRADIENT_STOP *gradientStops, UINT gradientStopsCount, ID2D1GradientStopCollection **gradientStopCollection) PURE;
-  STDMETHOD(CreateLayer)(THIS_ ID2D1Layer **layer) PURE;
-  STDMETHOD(CreateLinearGradientBrush)(THIS_ D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES *linearGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1LinearGradientBrush **linearGradientBrush) PURE;
-  STDMETHOD(CreateMesh)(THIS_ ID2D1Mesh **mesh) PURE;
-  STDMETHOD(CreateRadialGradientBrush)(THIS_ D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES *radialGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1RadialGradientBrush **radialGradientBrush) PURE;
   STDMETHOD(CreateSharedBitmap)(THIS_ REFIID riid, void *data, D2D1_BITMAP_PROPERTIES *bitmapProperties, ID2D1Bitmap **bitmap) PURE;
+  STDMETHOD(CreateBitmapBrush)(THIS_ ID2D1Bitmap *bitmap, ID2D1BitmapBrush **bitmapBrush) PURE;
   STDMETHOD(CreateSolidColorBrush)(THIS_ D2D1_COLOR_F *color, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1SolidColorBrush **solidColorBrush) PURE;
-  STDMETHOD_(void, DrawEllipse)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
-  STDMETHOD_(void, DrawGeometry)(THIS_ ID2D1Geometry *geometry, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
-  STDMETHOD_(void, DrawGlyphRun)(THIS_ D2D1_POINT_2F baselineOrigin, DWRITE_GLYPH_RUN *glyphRun, ID2D1Brush *foregroundBrush, DWRITE_MEASURING_MODE measuringMode) PURE;
+  STDMETHOD(CreateGradientStopCollection)(THIS_ D2D1_GRADIENT_STOP *gradientStops, UINT gradientStopsCount, ID2D1GradientStopCollection **gradientStopCollection) PURE;
+  STDMETHOD(CreateLinearGradientBrush)(THIS_ D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES *linearGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1LinearGradientBrush **linearGradientBrush) PURE;
+  STDMETHOD(CreateRadialGradientBrush)(THIS_ D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES *radialGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1RadialGradientBrush **radialGradientBrush) PURE;
+  STDMETHOD(CreateCompatibleRenderTarget)(THIS_ ID2D1BitmapRenderTarget **bitmapRenderTarget) PURE;
+  STDMETHOD(CreateLayer)(THIS_ ID2D1Layer **layer) PURE;
+  STDMETHOD(CreateMesh)(THIS_ ID2D1Mesh **mesh) PURE;
   STDMETHOD_(void, DrawLine)(THIS_ D2D1_POINT_2F point0, D2D1_POINT_2F point1, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
   STDMETHOD_(void, DrawRectangle)(THIS_ D2D1_RECT_F *rect, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
+  STDMETHOD_(void, FillRectangle)(THIS_ D2D1_RECT_F *rect, ID2D1Brush *brush) PURE;
   STDMETHOD_(void, DrawRoundedRectangle)(THIS_ D2D1_ROUNDED_RECT *roundedRect, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
-  STDMETHOD_(void, DrawText)(THIS_ WCHAR *string, UINT stringLength, IDWriteTextFormat *textFormat, D2D1_RECT_F *layoutRect, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options , DWRITE_MEASURING_MODE measuringMode) PURE;
-  STDMETHOD_(void, DrawTextLayout)(THIS_ D2D1_POINT_2F origin, IDWriteTextLayout *textLayout, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options) PURE;
+  STDMETHOD_(void, FillRoundedRectangle)(THIS_ D2D1_ROUNDED_RECT *roundedRect, ID2D1Brush *brush) PURE;
+  STDMETHOD_(void, DrawEllipse)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
   STDMETHOD_(void, FillEllipse)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1Brush *brush) PURE;
+  STDMETHOD_(void, DrawGeometry)(THIS_ ID2D1Geometry *geometry, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
   STDMETHOD_(void, FillGeometry)(THIS_ ID2D1Geometry *geometry, ID2D1Brush *brush, ID2D1Brush *opacityBrush) PURE;
-  STDMETHOD_(void, DrawBitmap)(THIS_ ID2D1Bitmap *bitmap, D2D1_RECT_F *destinationRectangle, FLOAT opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode , D2D1_RECT_F *sourceRectangle) PURE;
   STDMETHOD_(void, FillMesh)(THIS_ ID2D1Mesh *mesh, ID2D1Brush *brush) PURE;
   STDMETHOD_(void, FillOpacityMask)(THIS_ ID2D1Bitmap *opacityMask, ID2D1Brush *brush, D2D1_OPACITY_MASK_CONTENT content, D2D1_RECT_F *destinationRectangle, D2D1_RECT_F *sourceRectangle) PURE;
-  STDMETHOD_(void, FillRectangle)(THIS_ D2D1_RECT_F *rect, ID2D1Brush *brush) PURE;
-  STDMETHOD_(void, FillRoundedRectangle)(THIS_ D2D1_ROUNDED_RECT *roundedRect, ID2D1Brush *brush) PURE;
-  STDMETHOD(Flush)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
-  STDMETHOD_(D2D1_ANTIALIAS_MODE, GetAntialiasMode)(THIS) PURE;
-  STDMETHOD_(void, GetDpi)(THIS_ FLOAT *dpiX, FLOAT *dpiY) PURE;
-  STDMETHOD_(UINT32, GetMaximumBitmapSize)(THIS) PURE;
-  STDMETHOD_(D2D1_PIXEL_FORMAT, GetPixelFormat)(THIS) PURE;
-  STDMETHOD_(D2D1_SIZE_U, GetPixelSize)(THIS) PURE;
-  STDMETHOD_(D2D1_SIZE_F, GetSize)(THIS) PURE;
-  STDMETHOD_(void, GetTags)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
-  STDMETHOD_(D2D1_TEXT_ANTIALIAS_MODE, GetTextAntialiasMode)(THIS) PURE;
-  STDMETHOD_(void, GetTextRenderingParams)(THIS_ IDWriteRenderingParams **textRenderingParams) PURE;
+  STDMETHOD_(void, DrawBitmap)(THIS_ ID2D1Bitmap *bitmap, D2D1_RECT_F *destinationRectangle, FLOAT opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode , D2D1_RECT_F *sourceRectangle) PURE;
+  STDMETHOD_(void, DrawText)(THIS_ WCHAR *string, UINT stringLength, IDWriteTextFormat *textFormat, D2D1_RECT_F *layoutRect, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options , DWRITE_MEASURING_MODE measuringMode) PURE;
+  STDMETHOD_(void, DrawTextLayout)(THIS_ D2D1_POINT_2F origin, IDWriteTextLayout *textLayout, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options) PURE;
+  STDMETHOD_(void, DrawGlyphRun)(THIS_ D2D1_POINT_2F baselineOrigin, DWRITE_GLYPH_RUN *glyphRun, ID2D1Brush *foregroundBrush, DWRITE_MEASURING_MODE measuringMode) PURE;
+  STDMETHOD_(void, SetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
   STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
-  STDMETHOD_(BOOL, IsSupported)(THIS_ D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties) PURE;
-  STDMETHOD_(void, PopAxisAlignedClip)(THIS) PURE;
-  STDMETHOD_(void, PopLayer)(THIS) PURE;
-  STDMETHOD_(void, PushAxisAlignedClip)(THIS_ D2D1_RECT_F *clipRect, D2D1_ANTIALIAS_MODE antialiasMode) PURE;
+  STDMETHOD_(void, SetAntialiasMode)(THIS_ D2D1_ANTIALIAS_MODE antialiasMode) PURE;
+  STDMETHOD_(D2D1_ANTIALIAS_MODE, GetAntialiasMode)(THIS) PURE;
+  STDMETHOD_(void, SetTextAntialiasMode)(THIS_ D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode) PURE;
+  STDMETHOD_(D2D1_TEXT_ANTIALIAS_MODE, GetTextAntialiasMode)(THIS) PURE;
+  STDMETHOD_(void, SetTextRenderingParams)(THIS_ IDWriteRenderingParams *textRenderingParams) PURE;
+  STDMETHOD_(void, GetTextRenderingParams)(THIS_ IDWriteRenderingParams **textRenderingParams) PURE;
+  STDMETHOD_(void, SetTags)(THIS_ D2D1_TAG tag1, D2D1_TAG tag2) PURE;
+  STDMETHOD_(void, GetTags)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
   STDMETHOD_(void, PushLayer)(THIS_ D2D1_LAYER_PARAMETERS *layerParameters, ID2D1Layer *layer) PURE;
+  STDMETHOD_(void, PopLayer)(THIS) PURE;
+  STDMETHOD(Flush)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(void, SaveDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
   STDMETHOD_(void, RestoreDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
+  STDMETHOD_(void, PushAxisAlignedClip)(THIS_ D2D1_RECT_F *clipRect, D2D1_ANTIALIAS_MODE antialiasMode) PURE;
+  STDMETHOD_(void, PopAxisAlignedClip)(THIS) PURE;
+  STDMETHOD_(void, Clear)(THIS_ D2D1_COLOR_F *clearColor) PURE;
   STDMETHOD_(void, BeginDraw)(THIS) PURE;
   STDMETHOD(EndDraw)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
-  STDMETHOD_(void, SaveDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
-  STDMETHOD_(void, SetAntialiasMode)(THIS_ D2D1_ANTIALIAS_MODE antialiasMode) PURE;
+  STDMETHOD_(D2D1_PIXEL_FORMAT, GetPixelFormat)(THIS) PURE;
   STDMETHOD_(void, SetDpi)(THIS_ FLOAT dpiX, FLOAT dpiY) PURE;
-  STDMETHOD_(void, SetTags)(THIS_ D2D1_TAG tag1, D2D1_TAG tag2) PURE;
-  STDMETHOD_(void, SetTextAntialiasMode)(THIS_ D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode) PURE;
-  STDMETHOD_(void, SetTextRenderingParams)(THIS_ IDWriteRenderingParams *textRenderingParams) PURE;
-  STDMETHOD_(void, SetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
+  STDMETHOD_(void, GetDpi)(THIS_ FLOAT *dpiX, FLOAT *dpiY) PURE;
+  STDMETHOD_(D2D1_SIZE_F, GetSize)(THIS) PURE;
+  STDMETHOD_(D2D1_SIZE_U, GetPixelSize)(THIS) PURE;
+  STDMETHOD_(UINT32, GetMaximumBitmapSize)(THIS) PURE;
+  STDMETHOD_(BOOL, IsSupported)(THIS_ D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties) PURE;
 
   /* ID2D1HwndRenderTarget methods */
   STDMETHOD_(D2D1_WINDOW_STATE, CheckWindowState)(THIS) PURE;
@@ -1427,17 +1440,17 @@ DECLARE_INTERFACE_(ID2D1LinearGradientBrush, ID2D1Brush)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Brush methods */
-  STDMETHOD_(FLOAT, GetOpacity)(THIS) PURE;
-  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
   STDMETHOD_(void, SetOpacity)(THIS_ FLOAT opacity) PURE;
   STDMETHOD_(void, SetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
+  STDMETHOD_(FLOAT, GetOpacity)(THIS) PURE;
+  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
 
   /* ID2D1LinearGradientBrush methods */
+  STDMETHOD_(void, SetStartPoint)(THIS_ D2D1_POINT_2F startPoint) PURE;
+  STDMETHOD_(void, SetEndPoint)(THIS_ D2D1_POINT_2F endPoint) PURE;
+  STDMETHOD_(D2D1_POINT_2F, GetStartPoint)(THIS) PURE;
   STDMETHOD_(D2D1_POINT_2F, GetEndPoint)(THIS) PURE;
   STDMETHOD_(void, GetGradientStopCollection)(THIS_ ID2D1GradientStopCollection **gradientStopCollection) PURE;
-  STDMETHOD_(D2D1_POINT_2F, GetStartPoint)(THIS) PURE;
-  STDMETHOD_(void, SetEndPoint)(THIS_ D2D1_POINT_2F endPoint) PURE;
-  STDMETHOD_(void, SetStartPoint)(THIS_ D2D1_POINT_2F startPoint) PURE;
 
   END_INTERFACE
 };
@@ -1493,25 +1506,25 @@ DECLARE_INTERFACE_(ID2D1PathGeometry, ID2D1Geometry)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Geometry methods */
-  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
+  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
   STDMETHOD(CompareWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_MATRIX_3X2_F *inputGeometryTransform, D2D1_GEOMETRY_RELATION *relation) PURE;
+  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
+  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
   STDMETHOD(ComputeArea)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *area) PURE;
   STDMETHOD(ComputeLength)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *length) PURE;
   STDMETHOD(ComputePointAtLength)(THIS_ FLOAT length, D2D1_MATRIX_3X2_F *worldTransform, D2D1_POINT_2F *point, D2D1_POINT_2F *unitTangentVector) PURE;
-  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
   STDMETHOD(Widen)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
 
   /* ID2D1PathGeometry methods */
-  STDMETHOD(GetFigureCount)(THIS_ UINT32 *count) PURE;
-  STDMETHOD(GetSegmentCount)(THIS_ UINT32 *count) PURE;
   STDMETHOD(Open)(THIS_ ID2D1GeometrySink **geometrySink) PURE;
   STDMETHOD(Stream)(THIS_ ID2D1GeometrySink *geometrySink) PURE;
+  STDMETHOD(GetSegmentCount)(THIS_ UINT32 *count) PURE;
+  STDMETHOD(GetFigureCount)(THIS_ UINT32 *count) PURE;
 
   END_INTERFACE
 };
@@ -1549,21 +1562,21 @@ DECLARE_INTERFACE_(ID2D1RadialGradientBrush, ID2D1Brush)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Brush methods */
-  STDMETHOD_(FLOAT, GetOpacity)(THIS) PURE;
-  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
   STDMETHOD_(void, SetOpacity)(THIS_ FLOAT opacity) PURE;
   STDMETHOD_(void, SetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
+  STDMETHOD_(FLOAT, GetOpacity)(THIS) PURE;
+  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
 
   /* ID2D1RadialGradientBrush methods */
-  STDMETHOD_(D2D1_POINT_2F, GetCenter)(THIS) PURE;
-  STDMETHOD_(D2D1_POINT_2F, GetGradientOriginOffset)(THIS) PURE;
-  STDMETHOD_(void, GetGradientStopCollection)(THIS_ ID2D1GradientStopCollection **gradientStopCollection) PURE;
-  STDMETHOD_(FLOAT, GetRadiusX)(THIS) PURE;
-  STDMETHOD_(FLOAT, GetRadiusY)(THIS) PURE;
   STDMETHOD_(void, SetCenter)(THIS_ D2D1_POINT_2F center) PURE;
   STDMETHOD_(void, SetGradientOriginOffset)(THIS_ D2D1_POINT_2F gradientOriginOffset) PURE;
   STDMETHOD_(void, SetRadiusX)(THIS_ FLOAT radiusX) PURE;
   STDMETHOD_(void, SetRadiusY)(THIS_ FLOAT radiusY) PURE;
+  STDMETHOD_(D2D1_POINT_2F, GetCenter)(THIS) PURE;
+  STDMETHOD_(D2D1_POINT_2F, GetGradientOriginOffset)(THIS) PURE;
+  STDMETHOD_(FLOAT, GetRadiusX)(THIS) PURE;
+  STDMETHOD_(FLOAT, GetRadiusY)(THIS) PURE;
+  STDMETHOD_(void, GetGradientStopCollection)(THIS_ ID2D1GradientStopCollection **gradientStopCollection) PURE;
 
   END_INTERFACE
 };
@@ -1597,18 +1610,18 @@ DECLARE_INTERFACE_(ID2D1RectangleGeometry, ID2D1Geometry)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Geometry methods */
-  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
+  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
   STDMETHOD(CompareWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_MATRIX_3X2_F *inputGeometryTransform, D2D1_GEOMETRY_RELATION *relation) PURE;
+  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
+  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
   STDMETHOD(ComputeArea)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *area) PURE;
   STDMETHOD(ComputeLength)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *length) PURE;
   STDMETHOD(ComputePointAtLength)(THIS_ FLOAT length, D2D1_MATRIX_3X2_F *worldTransform, D2D1_POINT_2F *point, D2D1_POINT_2F *unitTangentVector) PURE;
-  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
   STDMETHOD(Widen)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
 
   /* ID2D1RectangleGeometry methods */
@@ -1647,59 +1660,59 @@ DECLARE_INTERFACE_(ID2D1RenderTarget, ID2D1Resource)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1RenderTarget methods */
-  STDMETHOD_(void, BeginDraw)(THIS) PURE;
-  STDMETHOD_(void, Clear)(THIS_ D2D1_COLOR_F *clearColor) PURE;
   STDMETHOD(CreateBitmap)(THIS_ D2D1_SIZE_U size, void *srcData, UINT32 pitch, D2D1_BITMAP_PROPERTIES *bitmapProperties, ID2D1Bitmap **bitmap) PURE;
-  STDMETHOD(CreateBitmapBrush)(THIS_ ID2D1Bitmap *bitmap, ID2D1BitmapBrush **bitmapBrush) PURE;
   STDMETHOD(CreateBitmapFromWicBitmap)(THIS_ IWICBitmapSource *wicBitmapSource, ID2D1Bitmap **bitmap) PURE;
-  STDMETHOD(CreateCompatibleRenderTarget)(THIS_ ID2D1BitmapRenderTarget **bitmapRenderTarget) PURE;
-  STDMETHOD(CreateGradientStopCollection)(THIS_ D2D1_GRADIENT_STOP *gradientStops, UINT gradientStopsCount, ID2D1GradientStopCollection **gradientStopCollection) PURE;
-  STDMETHOD(CreateLayer)(THIS_ ID2D1Layer **layer) PURE;
-  STDMETHOD(CreateLinearGradientBrush)(THIS_ D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES *linearGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1LinearGradientBrush **linearGradientBrush) PURE;
-  STDMETHOD(CreateMesh)(THIS_ ID2D1Mesh **mesh) PURE;
-  STDMETHOD(CreateRadialGradientBrush)(THIS_ D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES *radialGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1RadialGradientBrush **radialGradientBrush) PURE;
   STDMETHOD(CreateSharedBitmap)(THIS_ REFIID riid, void *data, D2D1_BITMAP_PROPERTIES *bitmapProperties, ID2D1Bitmap **bitmap) PURE;
+  STDMETHOD(CreateBitmapBrush)(THIS_ ID2D1Bitmap *bitmap, ID2D1BitmapBrush **bitmapBrush) PURE;
   STDMETHOD(CreateSolidColorBrush)(THIS_ D2D1_COLOR_F *color, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1SolidColorBrush **solidColorBrush) PURE;
-  STDMETHOD_(void, DrawBitmap)(THIS_ ID2D1Bitmap *bitmap, D2D1_RECT_F *destinationRectangle, FLOAT opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode , D2D1_RECT_F *sourceRectangle) PURE;
-  STDMETHOD_(void, DrawEllipse)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
-  STDMETHOD_(void, DrawGeometry)(THIS_ ID2D1Geometry *geometry, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
-  STDMETHOD_(void, DrawGlyphRun)(THIS_ D2D1_POINT_2F baselineOrigin, DWRITE_GLYPH_RUN *glyphRun, ID2D1Brush *foregroundBrush, DWRITE_MEASURING_MODE measuringMode) PURE;
+  STDMETHOD(CreateGradientStopCollection)(THIS_ D2D1_GRADIENT_STOP *gradientStops, UINT gradientStopsCount, ID2D1GradientStopCollection **gradientStopCollection) PURE;
+  STDMETHOD(CreateLinearGradientBrush)(THIS_ D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES *linearGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1LinearGradientBrush **linearGradientBrush) PURE;
+  STDMETHOD(CreateRadialGradientBrush)(THIS_ D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES *radialGradientBrushProperties, D2D1_BRUSH_PROPERTIES *brushProperties, ID2D1GradientStopCollection *gradientStopCollection, ID2D1RadialGradientBrush **radialGradientBrush) PURE;
+  STDMETHOD(CreateCompatibleRenderTarget)(THIS_ ID2D1BitmapRenderTarget **bitmapRenderTarget) PURE;
+  STDMETHOD(CreateLayer)(THIS_ ID2D1Layer **layer) PURE;
+  STDMETHOD(CreateMesh)(THIS_ ID2D1Mesh **mesh) PURE;
   STDMETHOD_(void, DrawLine)(THIS_ D2D1_POINT_2F point0, D2D1_POINT_2F point1, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
   STDMETHOD_(void, DrawRectangle)(THIS_ D2D1_RECT_F *rect, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
+  STDMETHOD_(void, FillRectangle)(THIS_ D2D1_RECT_F *rect, ID2D1Brush *brush) PURE;
   STDMETHOD_(void, DrawRoundedRectangle)(THIS_ D2D1_ROUNDED_RECT *roundedRect, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
-  STDMETHOD_(void, DrawText)(THIS_ WCHAR *string, UINT stringLength, IDWriteTextFormat *textFormat, D2D1_RECT_F *layoutRect, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options , DWRITE_MEASURING_MODE measuringMode) PURE;
-  STDMETHOD_(void, DrawTextLayout)(THIS_ D2D1_POINT_2F origin, IDWriteTextLayout *textLayout, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options) PURE;
-  STDMETHOD(EndDraw)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(void, FillRoundedRectangle)(THIS_ D2D1_ROUNDED_RECT *roundedRect, ID2D1Brush *brush) PURE;
+  STDMETHOD_(void, DrawEllipse)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
   STDMETHOD_(void, FillEllipse)(THIS_ D2D1_ELLIPSE *ellipse, ID2D1Brush *brush) PURE;
+  STDMETHOD_(void, DrawGeometry)(THIS_ ID2D1Geometry *geometry, ID2D1Brush *brush, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle) PURE;
   STDMETHOD_(void, FillGeometry)(THIS_ ID2D1Geometry *geometry, ID2D1Brush *brush, ID2D1Brush *opacityBrush) PURE;
   STDMETHOD_(void, FillMesh)(THIS_ ID2D1Mesh *mesh, ID2D1Brush *brush) PURE;
   STDMETHOD_(void, FillOpacityMask)(THIS_ ID2D1Bitmap *opacityMask, ID2D1Brush *brush, D2D1_OPACITY_MASK_CONTENT content, D2D1_RECT_F *destinationRectangle, D2D1_RECT_F *sourceRectangle) PURE;
-  STDMETHOD_(void, FillRectangle)(THIS_ D2D1_RECT_F *rect, ID2D1Brush *brush) PURE;
-  STDMETHOD_(void, FillRoundedRectangle)(THIS_ D2D1_ROUNDED_RECT *roundedRect, ID2D1Brush *brush) PURE;
-  STDMETHOD(Flush)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
-  STDMETHOD_(D2D1_ANTIALIAS_MODE, GetAntialiasMode)(THIS) PURE;
-  STDMETHOD_(void, GetDpi)(THIS_ FLOAT *dpiX, FLOAT *dpiY) PURE;
-  STDMETHOD_(UINT32, GetMaximumBitmapSize)(THIS) PURE;
-  STDMETHOD_(D2D1_PIXEL_FORMAT, GetPixelFormat)(THIS) PURE;
-  STDMETHOD_(D2D1_SIZE_U, GetPixelSize)(THIS) PURE;
-  STDMETHOD_(D2D1_SIZE_F, GetSize)(THIS) PURE;
-  STDMETHOD_(void, GetTags)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
-  STDMETHOD_(D2D1_TEXT_ANTIALIAS_MODE, GetTextAntialiasMode)(THIS) PURE;
-  STDMETHOD_(void, GetTextRenderingParams)(THIS_ IDWriteRenderingParams **textRenderingParams) PURE;
-  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
-  STDMETHOD_(BOOL, IsSupported)(THIS_ D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties) PURE;
-  STDMETHOD_(void, PopAxisAlignedClip)(THIS) PURE;
-  STDMETHOD_(void, PopLayer)(THIS) PURE;
-  STDMETHOD_(void, PushAxisAlignedClip)(THIS_ D2D1_RECT_F *clipRect, D2D1_ANTIALIAS_MODE antialiasMode) PURE;
-  STDMETHOD_(void, PushLayer)(THIS_ D2D1_LAYER_PARAMETERS *layerParameters, ID2D1Layer *layer) PURE;
-  STDMETHOD_(void, RestoreDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
-  STDMETHOD_(void, SaveDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
-  STDMETHOD_(void, SetAntialiasMode)(THIS_ D2D1_ANTIALIAS_MODE antialiasMode) PURE;
-  STDMETHOD_(void, SetDpi)(THIS_ FLOAT dpiX, FLOAT dpiY) PURE;
-  STDMETHOD_(void, SetTags)(THIS_ D2D1_TAG tag1, D2D1_TAG tag2) PURE;
-  STDMETHOD_(void, SetTextAntialiasMode)(THIS_ D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode) PURE;
-  STDMETHOD_(void, SetTextRenderingParams)(THIS_ IDWriteRenderingParams *textRenderingParams) PURE;
+  STDMETHOD_(void, DrawBitmap)(THIS_ ID2D1Bitmap *bitmap, D2D1_RECT_F *destinationRectangle, FLOAT opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode , D2D1_RECT_F *sourceRectangle) PURE;
+  STDMETHOD_(void, DrawText)(THIS_ WCHAR *string, UINT stringLength, IDWriteTextFormat *textFormat, D2D1_RECT_F *layoutRect, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options , DWRITE_MEASURING_MODE measuringMode) PURE;
+  STDMETHOD_(void, DrawTextLayout)(THIS_ D2D1_POINT_2F origin, IDWriteTextLayout *textLayout, ID2D1Brush *defaultForegroundBrush, D2D1_DRAW_TEXT_OPTIONS options) PURE;
+  STDMETHOD_(void, DrawGlyphRun)(THIS_ D2D1_POINT_2F baselineOrigin, DWRITE_GLYPH_RUN *glyphRun, ID2D1Brush *foregroundBrush, DWRITE_MEASURING_MODE measuringMode) PURE;
   STDMETHOD_(void, SetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
+  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
+  STDMETHOD_(void, SetAntialiasMode)(THIS_ D2D1_ANTIALIAS_MODE antialiasMode) PURE;
+  STDMETHOD_(D2D1_ANTIALIAS_MODE, GetAntialiasMode)(THIS) PURE;
+  STDMETHOD_(void, SetTextAntialiasMode)(THIS_ D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode) PURE;
+  STDMETHOD_(D2D1_TEXT_ANTIALIAS_MODE, GetTextAntialiasMode)(THIS) PURE;
+  STDMETHOD_(void, SetTextRenderingParams)(THIS_ IDWriteRenderingParams *textRenderingParams) PURE;
+  STDMETHOD_(void, GetTextRenderingParams)(THIS_ IDWriteRenderingParams **textRenderingParams) PURE;
+  STDMETHOD_(void, SetTags)(THIS_ D2D1_TAG tag1, D2D1_TAG tag2) PURE;
+  STDMETHOD_(void, GetTags)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(void, PushLayer)(THIS_ D2D1_LAYER_PARAMETERS *layerParameters, ID2D1Layer *layer) PURE;
+  STDMETHOD_(void, PopLayer)(THIS) PURE;
+  STDMETHOD(Flush)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(void, SaveDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
+  STDMETHOD_(void, RestoreDrawingState)(THIS_ ID2D1DrawingStateBlock *drawingStateBlock) PURE;
+  STDMETHOD_(void, PushAxisAlignedClip)(THIS_ D2D1_RECT_F *clipRect, D2D1_ANTIALIAS_MODE antialiasMode) PURE;
+  STDMETHOD_(void, PopAxisAlignedClip)(THIS) PURE;
+  STDMETHOD_(void, Clear)(THIS_ D2D1_COLOR_F *clearColor) PURE;
+  STDMETHOD_(void, BeginDraw)(THIS) PURE;
+  STDMETHOD(EndDraw)(THIS_ D2D1_TAG *tag1, D2D1_TAG *tag2) PURE;
+  STDMETHOD_(D2D1_PIXEL_FORMAT, GetPixelFormat)(THIS) PURE;
+  STDMETHOD_(void, SetDpi)(THIS_ FLOAT dpiX, FLOAT dpiY) PURE;
+  STDMETHOD_(void, GetDpi)(THIS_ FLOAT *dpiX, FLOAT *dpiY) PURE;
+  STDMETHOD_(D2D1_SIZE_F, GetSize)(THIS) PURE;
+  STDMETHOD_(D2D1_SIZE_U, GetPixelSize)(THIS) PURE;
+  STDMETHOD_(UINT32, GetMaximumBitmapSize)(THIS) PURE;
+  STDMETHOD_(BOOL, IsSupported)(THIS_ D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties) PURE;
 
   END_INTERFACE
 };
@@ -1799,18 +1812,18 @@ DECLARE_INTERFACE_(ID2D1RoundedRectangleGeometry, ID2D1Geometry)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Geometry methods */
-  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
+  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
   STDMETHOD(CompareWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_MATRIX_3X2_F *inputGeometryTransform, D2D1_GEOMETRY_RELATION *relation) PURE;
+  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
+  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
   STDMETHOD(ComputeArea)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *area) PURE;
   STDMETHOD(ComputeLength)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *length) PURE;
   STDMETHOD(ComputePointAtLength)(THIS_ FLOAT length, D2D1_MATRIX_3X2_F *worldTransform, D2D1_POINT_2F *point, D2D1_POINT_2F *unitTangentVector) PURE;
-  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
   STDMETHOD(Widen)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
 
   /* ID2D1RoundedRectangleGeometry methods */
@@ -1846,13 +1859,13 @@ DECLARE_INTERFACE_(ID2D1SimplifiedGeometrySink, IUnknown)
   STDMETHOD_(ULONG, Release)(THIS) PURE;
 
   /* ID2D1SimplifiedGeometrySink methods */
-  STDMETHOD_(void, AddBeziers)(THIS_ D2D1_BEZIER_SEGMENT *beziers, UINT beziersCount) PURE;
-  STDMETHOD_(void, AddLines)(THIS_ D2D1_POINT_2F *points, UINT pointsCount) PURE;
-  STDMETHOD_(void, BeginFigure)(THIS_ D2D1_POINT_2F startPoint, D2D1_FIGURE_BEGIN figureBegin) PURE;
-  STDMETHOD(Close)(THIS) PURE;
-  STDMETHOD_(void, EndFigure)(THIS_ D2D1_FIGURE_END figureEnd) PURE;
   STDMETHOD_(void, SetFillMode)(THIS_ D2D1_FILL_MODE fillMode) PURE;
   STDMETHOD_(void, SetSegmentFlags)(THIS_ D2D1_PATH_SEGMENT vertexFlags) PURE;
+  STDMETHOD_(void, BeginFigure)(THIS_ D2D1_POINT_2F startPoint, D2D1_FIGURE_BEGIN figureBegin) PURE;
+  STDMETHOD_(void, AddLines)(THIS_ D2D1_POINT_2F *points, UINT pointsCount) PURE;
+  STDMETHOD_(void, AddBeziers)(THIS_ D2D1_BEZIER_SEGMENT *beziers, UINT beziersCount) PURE;
+  STDMETHOD_(void, EndFigure)(THIS_ D2D1_FIGURE_END figureEnd) PURE;
+  STDMETHOD(Close)(THIS) PURE;
 
   END_INTERFACE
 };
@@ -1883,14 +1896,14 @@ DECLARE_INTERFACE_(ID2D1SolidColorBrush, ID2D1Brush)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Brush methods */
-  STDMETHOD_(FLOAT, GetOpacity)(THIS) PURE;
-  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
   STDMETHOD_(void, SetOpacity)(THIS_ FLOAT opacity) PURE;
   STDMETHOD_(void, SetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
+  STDMETHOD_(FLOAT, GetOpacity)(THIS) PURE;
+  STDMETHOD_(void, GetTransform)(THIS_ D2D1_MATRIX_3X2_F *transform) PURE;
 
   /* ID2D1SolidColorBrush methods */
-  STDMETHOD_(D2D1_COLOR_F, GetColor)(THIS) PURE;
   STDMETHOD_(void, SetColor)(THIS_ D2D1_COLOR_F *color) PURE;
+  STDMETHOD_(D2D1_COLOR_F, GetColor)(THIS) PURE;
 
   END_INTERFACE
 };
@@ -1917,15 +1930,15 @@ DECLARE_INTERFACE_(ID2D1StrokeStyle, ID2D1Resource)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1StrokeStyle methods */
+  STDMETHOD_(D2D1_CAP_STYLE, GetStartCap)(THIS) PURE;
+  STDMETHOD_(D2D1_CAP_STYLE, GetEndCap)(THIS) PURE;
   STDMETHOD_(D2D1_CAP_STYLE, GetDashCap)(THIS) PURE;
-  STDMETHOD_(void, GetDashes)(THIS_ FLOAT *dashes, UINT dashesCount) PURE;
-  STDMETHOD_(UINT32, GetDashesCount)(THIS) PURE;
+  STDMETHOD_(FLOAT, GetMiterLimit)(THIS) PURE;
+  STDMETHOD_(D2D1_LINE_JOIN, GetLineJoin)(THIS) PURE;
   STDMETHOD_(FLOAT, GetDashOffset)(THIS) PURE;
   STDMETHOD_(D2D1_DASH_STYLE, GetDashStyle)(THIS) PURE;
-  STDMETHOD_(D2D1_CAP_STYLE, GetEndCap)(THIS) PURE;
-  STDMETHOD_(D2D1_LINE_JOIN, GetLineJoin)(THIS) PURE;
-  STDMETHOD_(FLOAT, GetMiterLimit)(THIS) PURE;
-  STDMETHOD_(D2D1_CAP_STYLE, GetStartCap)(THIS) PURE;
+  STDMETHOD_(UINT32, GetDashesCount)(THIS) PURE;
+  STDMETHOD_(void, GetDashes)(THIS_ FLOAT *dashes, UINT dashesCount) PURE;
 
   END_INTERFACE
 };
@@ -1983,18 +1996,18 @@ DECLARE_INTERFACE_(ID2D1TransformedGeometry, ID2D1Geometry)
   STDMETHOD_(void, GetFactory)(THIS_ ID2D1Factory **factory) PURE;
 
   /* ID2D1Geometry methods */
-  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
+  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
+  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
   STDMETHOD(CompareWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_MATRIX_3X2_F *inputGeometryTransform, D2D1_GEOMETRY_RELATION *relation) PURE;
+  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
+  STDMETHOD(CombineWithGeometry)(THIS_ ID2D1Geometry *inputGeometry, D2D1_COMBINE_MODE combineMode, D2D1_MATRIX_3X2_F *inputGeometryTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
+  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
   STDMETHOD(ComputeArea)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *area) PURE;
   STDMETHOD(ComputeLength)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, FLOAT *length) PURE;
   STDMETHOD(ComputePointAtLength)(THIS_ FLOAT length, D2D1_MATRIX_3X2_F *worldTransform, D2D1_POINT_2F *point, D2D1_POINT_2F *unitTangentVector) PURE;
-  STDMETHOD(FillContainsPoint)(THIS_ D2D1_POINT_2F point, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(GetBounds)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(GetWidenedBounds)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, D2D1_RECT_F *bounds) PURE;
-  STDMETHOD(Outline)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(StrokeContainsPoint)(THIS_ D2D1_POINT_2F point, FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, BOOL *contains) PURE;
-  STDMETHOD(Simplify)(THIS_ D2D1_GEOMETRY_SIMPLIFICATION_OPTION simplificationOption, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
-  STDMETHOD(Tessellate)(THIS_ D2D1_MATRIX_3X2_F *worldTransform, ID2D1TessellationSink *tessellationSink) PURE;
   STDMETHOD(Widen)(THIS_ FLOAT strokeWidth, ID2D1StrokeStyle *strokeStyle, D2D1_MATRIX_3X2_F *worldTransform, ID2D1SimplifiedGeometrySink *geometrySink) PURE;
 
   /* ID2D1TransformedGeometry methods */
@@ -2021,24 +2034,45 @@ DECLARE_INTERFACE_(ID2D1TransformedGeometry, ID2D1Geometry)
 #define ID2D1TransformedGeometry_GetSourceGeometry(this,A) (this)->lpVtbl->GetSourceGeometry(this,A)
 #define ID2D1TransformedGeometry_GetTransform(this,A) (this)->lpVtbl->GetTransform(this,A)
 
-/* already exists in unknwn.h>
-#define INTERFACE IUnknown
-DECLARE_INTERFACE(IUnknown)
-{
-  BEGIN_INTERFACE
 
-  /* IUnknown methods /
-  STDMETHOD(QueryInterface)(THIS_ REFIID riid, void **ppvObject) PURE;
-  STDMETHOD_(ULONG, AddRef)(THIS) PURE;
-  STDMETHOD_(ULONG, Release)(THIS) PURE;
 
-  END_INTERFACE
-};
-#undef INTERFACE
+static const IID IID_ID2D1Factory = {0x06152247,0x6f50,0x465a,{0x92,0x45,0x11,0x8b,0xfd,0x3b,0x60,0x07}};
 
-#define IUnknown_QueryInterface(this,A,B) (this)->lpVtbl->QueryInterface(this,A,B)
-#define IUnknown_AddRef(this) (this)->lpVtbl->AddRef(this)
-#define IUnknown_Release(this) (this)->lpVtbl->Release(this)
-*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+HRESULT WINAPI D2D1CreateFactory(
+  D2D1_FACTORY_TYPE factoryType,
+  REFIID riid,
+  CONST D2D1_FACTORY_OPTIONS *pFactoryOptions,
+  void **ppIFactory
+);
+  
+WINBOOL WINAPI D2D1InvertMatrix(
+  D2D1_MATRIX_3X2_F *matrix
+);
+
+WINBOOL WINAPI D2D1IsMatrixInvertible(
+  const D2D1_MATRIX_3X2_F *matrix
+);
+
+void WINAPI D2D1MakeRotateMatrix(
+  FLOAT angle,
+  D2D1_POINT_2F center,
+  D2D1_MATRIX_3X2_F *matrix
+);
+
+void WINAPI D2D1MakeSkewMatrix(
+  FLOAT angleX,
+  FLOAT angleY,
+  D2D1_POINT_2F center,
+  D2D1_MATRIX_3X2_F *matrix
+);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _D2D1_H */
